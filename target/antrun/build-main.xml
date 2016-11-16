@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main" if="deploy.remote">
+  <scp trust="true" todir="${deploy.remote.user}:${deploy.remote.password}@${deploy.remote.ip}:/opt/jboss/apps" failonerror="true">
+    <fileset dir="C:\Developer\git\fluig-tools\target">
+      <include name="*.war"/>
+    </fileset>
+  </scp>
+</target>
+</project>
