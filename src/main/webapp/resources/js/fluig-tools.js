@@ -4,7 +4,9 @@ var fluigToolsObj = SuperWidget.extend({
 	loading : null,
 
 	init: function() {
+
 		if(this.mode == "view"){
+
 			FLUIGC.calendar('.date');
 			this.maskFields();
 			this.createLoading();

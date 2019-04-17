@@ -5,27 +5,18 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-
-
-
-
-
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fluig.jdbc.ConnectionFactory;
 
 
 
-
-
 public class ExecuteQuery {
+
 	private Logger log = LoggerFactory.getLogger(ExecuteQuery.class);
 	private Connection con = null;
 	private ResultSet rs;
@@ -33,23 +24,34 @@ public class ExecuteQuery {
 	private String query = null;
 
 	public ExecuteQuery() {
+
 		con = new ConnectionFactory().getConnection();
 	}
 
 	public Workbook executeQuery() {
+
 		Workbook xls = null;
+
 		try {
 			this.stmt = this.con.createStatement();
-			if(query != null){
+
+			if (query != null) {
 				this.rs = this.stmt.executeQuery(query);
 				xls = generateWB();
 			}
+
 		} catch (SQLException e) {
 			log.error("# Erro ao consultar datasets: " + e.getMessage());
 			e.printStackTrace();
+
+		} catch (Exception e) {
+			log.error("Erro desconhecido: " + e.getMessage());
+
 		} finally {
 			this.close(rs, stmt, con);
 		}
+
+
 		return xls;
 	}
 
@@ -157,15 +159,15 @@ public class ExecuteQuery {
 		sql.append("ON (p.NUM_PROCES = a.NUM_PROCES and "); 
 		sql.append("p.COD_EMPRESA = a.COD_EMPRESA and "); 
 		sql.append("a.NUM_SEQ_ANEXO = 1) "); 
-		sql.append("                                                    LEFT OUTER JOIN "); 
-		sql.append("                                                    nova_ficha");
-		sql.append("                                                    nf on (nf.version = a.nr_versao and nf.documentid = a.nr_documento) "); 
-		sql.append("                                                    LEFT OUTER JOIN (select distinct * from sla_em_segundos_atividades)  sla on (p.NUM_PROCES = sla.num_proces and h.NUM_SEQ_MOVTO = sla.num_seq_movto and sla.ativo = 1) "); 
-		sql.append("                                                    left outer join fdn_usertenant requisitante on (requisitante.TENANT_ID = 1 and  requisitante.user_code = p.cod_matr_requisit ) ");
-		sql.append("                                                    left outer join fdn_user requisitante_name on (requisitante_name.user_id = requisitante.user_tenant_id) ");
-		sql.append("                                                    left outer join fdn_usertenant responsavel on (responsavel.TENANT_ID = 1 and  responsavel.user_code = t.cd_matricula ) ");
-		sql.append("                                                    left outer join fdn_user responsavel_name on (responsavel_name.user_id = responsavel.user_tenant_id) ");
-		sql.append("     where p.COD_EMPRESA = 1 "); 
+		sql.append(" LEFT OUTER JOIN ");
+		sql.append(" nova_ficha");
+		sql.append(" nf on (nf.version = a.nr_versao and nf.documentid = a.nr_documento) ");
+		sql.append(" LEFT OUTER JOIN (select distinct * from sla_em_segundos_atividades)  sla on (p.NUM_PROCES = sla.num_proces and h.NUM_SEQ_MOVTO = sla.num_seq_movto and sla.ativo = 1) ");
+		sql.append(" left outer join fdn_usertenant requisitante on (requisitante.TENANT_ID = 1 and  requisitante.user_code = p.cod_matr_requisit ) ");
+		sql.append(" left outer join fdn_user requisitante_name on (requisitante_name.user_id = requisitante.user_tenant_id) ");
+		sql.append(" left outer join fdn_usertenant responsavel on (responsavel.TENANT_ID = 1 and  responsavel.user_code = t.cd_matricula ) ");
+		sql.append(" left outer join fdn_user responsavel_name on (responsavel_name.user_id = responsavel.user_tenant_id) ");
+		sql.append(" where p.COD_EMPRESA = 1 ");
 
 		if(!process.equals("")){
 			sql.append("and p.NUM_PROCES in("+process.toString()+") ");
@@ -222,17 +224,34 @@ public class ExecuteQuery {
 		log.info("#create sheet");
 		Workbook wb = new HSSFWorkbook();
 		Sheet sheet = wb.createSheet("SLA-Processos");
-		String[] headers = new String[] {"Solicitação","Solicitação Origem","Data Abertura","Hora Abertura","Área","Processo",
-				"Atividade","Cliente","Solicitante Registro","Solicitante","Responsável","Data Conclusão",
-				"Hora Conclusão","Status","Data Prazo","Hora Prazo","SLA Previsto","SLA Realizado"};
-
-
 		Row header = sheet.createRow(0);
+		String[] headers = new String[] {"Solicitação",
+				  						 "Solicitação Origem",
+				  						 "Data Abertura",
+										 "Hora Abertura",
+										 "Área",
+										 "Processo",
+										 "Atividade",
+										 "Cliente",
+										 "Solicitante Registro",
+										 "Solicitante",
+										 "Responsável",
+										 "Data Conclusão",
+										 "Hora Conclusão",
+										 "Status",
+										 "Data Prazo",
+										 "Hora Prazo",
+										 "SLA Previsto",
+										 "SLA Realizado"};
+
+
+
 		for(int rn=0; rn<headers.length; rn++) {
 			header.createCell(rn).setCellValue(headers[rn]);
 		}
 
 		int row = 1;
+
 		try {
 			while(rs.next()) {
 				Row dataRow = sheet.createRow(row);
@@ -260,6 +279,7 @@ public class ExecuteQuery {
 		} catch (Exception e) {
 			log.error("Erro ao gerar relatorio xls: " + e.toString());
 		}
+
 		return wb;
 	}
 

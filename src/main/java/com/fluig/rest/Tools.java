@@ -47,7 +47,9 @@ public class Tools {
 		query.makeQuery(process,detalhado,consultaAbertura,dtAbertura,
 						dtFinal,consultaVencimento,dtVencimentoIni,dtVencimentoEnd,area,
 						processWorkflow,openUser,currentUser);
+
 		Workbook content = query.executeQuery();
+
 		File temp = null;
 
 		try {
